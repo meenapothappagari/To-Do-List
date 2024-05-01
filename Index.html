@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List</title>
+    <link rel="stylesheet" href="todolist.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+   
+</head>
+
+<body onload="time()">
+    <main>
+        <nav>
+            <div class="nav">
+                <img src="https://cdn.icon-icons.com/icons2/290/PNG/512/notepad_30848.png" alt="">
+                <h1 style="font-size: 40px;">To-Do List</h1>
+            </div>
+        </nav>
+        <div class="main">
+            <div class="time" id="timer">
+                <p id="time">00:00:00 AM </p>
+                <p id="date">Tuesday 4/30/2024</p>
+            </div>
+            <div class="mainbox" id="plus">
+                <div class="completed">
+                    <p>0</p>
+                    <h4>Total Tasks <br> number of you have done</h4>
+                </div>
+                <div class="pending">
+                    <p>0</p>
+                    <h4>Total Tasks <br> number of you have done</h4>
+                </div>
+                <div class="total">
+                    <p>0</p>
+                    <h4>Total Tasks <br> number of you have done</h4>
+                </div>
+            </div>
+            <div class="newtask">
+                <button id="newone" class="newtask1">Add New Task</button>
+                <span><button id="all" class="all">All</button></span>
+            </div>
+
+            <div class="container" id="container">
+                <input type="text" class="text" placeholder="add to task" id="text">
+                <select class="category">
+                    <option>select</option>
+                    <option>home</option>
+                    <option>business</option>
+                    <option>office</option>
+                </select>
+                <i class="fa fa-save" style="font-size: 22px;" id="save"></i>
+                <i class="fa fa-close" style="font-size: 23px;" id="close"></i>
+            </div>
+            <div class="plus" id="plus">
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const data = new Date();
+        let timeDisplay = Date.now();
+        const today = new Date(timeDisplay)
+        document.getElementById('date').innerHTML = today.toDateString();
+        //document.getElementById('time').innerHTML=today.toDateString();
+        function time() {
+            const data = new Date();
+            let h = data.getHours();
+            let m = data.getMinutes();
+            let s = data.getSeconds();
+
+            if (h < 60)
+                h = "" + h;
+            if (m < 60)
+                m = "" + m;
+            if (s < 60)
+                s = "" + s;
+
+            document.getElementById('time').innerHTML = h + ":" + m + ":" + s;
+            setTimeout('time()', 1000);
+        }
+        var tasks = [];
+
+        let newTaskbtn = document.getElementById("newone");
+        let savebtn = document.getElementById("save");
+        let closebtn = document.getElementById("close");
+        let taskInput = document.getElementById("text");
+        let categorySelect = document.querySelector(".category");
+        let plus = document.querySelector(".plus");
+        let completedTaskCounter = document.querySelector(".completed");
+        let pendingTaskCounter = document.querySelector(".pending");
+        let totalTaskCounter = document.querySelector(".total");
+
+        function updateTaskCounters() {
+            let completedTasks = tasks.filter(function (task) {
+                return task.completed;
+            });
+            let pendingTasks = tasks.filter(function (task) {
+                return !task.completed;
+            });
+            completedTaskCounter.textContent = completedTasks.length;
+            pendingTaskCounter.textContent = pendingTasks.length;
+            totalTaskCounter.textContent = tasks.length;
+            plus.style.display="block";
+        }
+
+        function show() {
+            document.getElementById("container").style.display = "block";
+        }
+
+        function hide() {
+            document.getElementById("container");
+            taskInput.value = ""; 
+            categorySelect.selectedIndex = 0; 
+        }
+
+        newTaskbtn.addEventListener("click", show);
+
+        closebtn.addEventListener("click", hide);
+
+        function saveTask() {
+            let taskText = taskInput.value.trim();
+            let category = categorySelect.value;
+            if (taskText !== "") {
+                var task = {
+                    task: taskText,
+                    completed: false,
+                    category: category,
+                    pending: false,
+                };
+                console.log(task)
+                tasks.push(task);
+                renderTask(task);
+                console.log(task)
+                updateTaskCounters();
+                hide();
+            }
+        }
+        function renderTask(task) {
+            var taskItem = document.createElement("div");
+            taskItem.classList.add("select");
+            taskItem.innerHTML = '<span>' + task.task + ' - ' + task.category + '</span>' +
+                '<i class="fa fa-edit edit" style="font-size:24px" id="edit"></i>' +
+                '<i class="fa fa-trash-o delete" style="font-size:24px" id="trash">' +
+                '<i class="fa fa-check check" style="font-size:24px" id="check">';
+            plus.appendChild(taskItem);
+        }
+        savebtn.addEventListener("click", saveTask);
+
+        plus.addEventListener("click", function (event) {
+            var target = event.target;
+            if (target.classList.contains("delete")) {
+                let taskItem = target.parentElement;
+                let taskText = taskItem.querySelector("span").textContent;
+                let index = tasks.findIndex(function (task) {
+                    return task.task === taskText;
+                });
+                if (index !== 0) {
+                    tasks.splice(index, 1);
+                    taskItem.remove();
+                    updateTaskCounters();
+                }
+            } else if (target.classList.contains("edit")) {
+                let taskItem = target.parentElement;
+                let taskTextElement = taskItem.querySelector("span");
+                let taskText = taskTextElement.textContent;
+                let newTaskText = prompt("Edit task", taskText);
+                if (newTaskText !== null && newTaskText.trim() !== "") {
+                    taskTextElement.textContent = newTaskText;
+                    let index = tasks.findIndex(function (task) {
+                        return task.task === taskText;
+                    });
+                    if (index !== 0) {
+                        tasks[index].task = newTaskText;
+                    }
+                }
+                plus.addEventListener("click", function (event) {
+                    let target = event.target;
+                    if (target.type === "check") {
+                        let taskItem = target.parentElement;
+                        let taskText = taskItem.querySelector("span").textContent;
+                        let index = tasks.findIndex(function (task) {
+                            return task.task === taskText;
+                        });
+
+                    }
+                });
+            }
+
+        });
+//for all ki idhi apply chestunna
+        document.getElementById("all").addEventListener("click", function () {
+            var allTasksString = tasks.map(function (task) {
+                return task.task + ' - ' + task.category;
+            }).join('\n');
+            alert("All Tasks:\n" + allTasksString);
+        });
+
+    </script>
+    
+</body>
+
+</html>
