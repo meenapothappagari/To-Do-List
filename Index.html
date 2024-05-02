@@ -103,7 +103,6 @@
             completedTaskCounter.textContent = completedTasks.length;
             pendingTaskCounter.textContent = pendingTasks.length;
             totalTaskCounter.textContent = tasks.length;
-            plus.style.display="block";
         }
 
         function show() {
@@ -111,7 +110,7 @@
         }
 
         function hide() {
-            document.getElementById("container");
+            document.getElementById("container").style.display = "block";
             taskInput.value = ""; 
             categorySelect.selectedIndex = 0; 
         }
