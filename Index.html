@@ -166,7 +166,7 @@
                 let taskTextElement = taskItem.querySelector("span");
                 let taskText = taskTextElement.textContent;
                 let newTaskText = prompt("Edit task", taskText);
-                if (newTaskText !== null && newTaskText.trim() !== "") {
+                if (newTaskText !== null) {
                     taskTextElement.textContent = newTaskText;
                     let index = tasks.findIndex(function (task) {
                         return task.task === taskText;
